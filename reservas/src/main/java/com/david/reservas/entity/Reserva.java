@@ -157,36 +157,13 @@ public class Reserva {
 
     }
 
-    public void actualizar(Long idHuesped,
-                           Long idHabitacion,
-                           LocalDate fechaEntrada,
-                           LocalDate fechaSalida,
-                           Short numeroPersonas,
-                           Short capacidadPersonasHabitacion,
-                           Double precioNoche){
-        //solo para pruebas
-        precioNoche=10.0;
-        capacidadPersonasHabitacion = 4;
-        numeroPersonas = 4;
+    public void actualizar(LocalDate fechaEntrada, LocalDate fechaSalida){
 
-        validarActualizacionPermitida();
+        validarFechas(fechaEntrada,fechaSalida);
 
-        validarDatos(idHuesped,idHabitacion,fechaEntrada,fechaSalida,numeroPersonas,capacidadPersonasHabitacion);
-
-        if(
-                Objects.equals(this.fechaEntrada,fechaEntrada) ||
-                Objects.equals(this.fechaSalida,fechaSalida) ||
-                Objects.equals(this.fechaEntrada,fechaEntrada)
-
-        ){
-            this.fechaSalida=fechaSalida;
-            this.fechaEntrada=fechaEntrada;
-            this.precioNoche=precioNoche;
-            this.precioTotal=calcularPrecioTotal(fechaEntrada,fechaSalida,precioNoche);
-        }
-
-        this.idHuesped = idHuesped;
-        this.idHabitacion = idHabitacion;
+        this.fechaSalida=fechaSalida;
+        this.fechaEntrada=fechaEntrada;
+        this.precioTotal=calcularPrecioTotal(fechaEntrada,fechaSalida,precioNoche);
 
     }
 

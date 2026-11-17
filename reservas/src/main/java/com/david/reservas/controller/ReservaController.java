@@ -2,19 +2,20 @@ package com.david.reservas.controller;
 
 import com.david.commons.controller.CrudController;
 import com.david.commons.docs.ProblemaDoc;
+import com.david.reservas.dto.ActualizarReservaRequest;
 import com.david.reservas.dto.ReservaRequest;
 import com.david.reservas.dto.ReservaResponse;
 import com.david.reservas.service.ReservaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "API reserva", description = "Métodos para la géstion de las reservas")
@@ -38,6 +39,26 @@ public class ReservaController extends CrudController<ReservaRequest, ReservaRes
     ) {
         service.actualizarEstadoReserva(idReserva,idEstado);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PutMapping("/actualizarReserva/{id}")
+    @Operation(summary = "Actualizar un recurso existente")
+    @ApiResponse(responseCode = "200",description = "Recurso actualizado.")
+    @ApiResponse(responseCode = "404", description = "El recurso no existe",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemaDoc.class)))
+    @ApiResponse(responseCode = "409", description = "Conflicto con datos existentes",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemaDoc.class)))
+    public ResponseEntity<ReservaResponse> actualizarReserva(
+            @Valid @RequestBody ActualizarReservaRequest request,
+            @Parameter(description = "Id del recurso.", example = "1")
+            @PathVariable @Positive(message = "El id debe ser positivo.") Long id
+
+    ){
+        validarIdNotNullPositive(id);
+        return ResponseEntity.ok(service.actualizarReserva(request,id));
     }
 
 }

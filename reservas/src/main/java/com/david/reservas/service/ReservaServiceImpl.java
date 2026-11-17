@@ -1,8 +1,11 @@
 package com.david.reservas.service;
 
+import com.david.commons.clients.HuespedClient;
+import com.david.commons.dto.huespedes.HuespedResponse;
 import com.david.commons.enums.EstadoRegistro;
 import com.david.commons.exceptions.ConflictoException;
 import com.david.commons.exceptions.RecursoNoEncontradoException;
+import com.david.reservas.dto.ActualizarReservaRequest;
 import com.david.reservas.dto.ReservaRequest;
 import com.david.reservas.dto.ReservaResponse;
 import com.david.reservas.entity.Reserva;
@@ -23,39 +26,36 @@ import static com.david.reservas.enums.EstadoReserva.*;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
+
+//todo validar habitación obtener datos y cambiar estado
 public class ReservaServiceImpl implements ReservaService{
     private final ReservaMapper reservaMapper;
     private final ReservaRepository reservaRepository;
-    //todo validar y cambiar estado en actualizar, eliminar y agregar
-    //una habitacion solo puede tener una reserva en confirmada o en curso (verificar en agregar y en actualizar)
-    //no se puede cambiar un huesped ni habitación en actualizar, deben ser los mismos
+
+    private final List<EstadoReserva> estadosNoValidosHuesped = List.of(CONFIRMADA, EN_CURSO);
+
+
+    private final HuespedClient huespedClient;
+
     @Override
     public ReservaResponse actualizar(ReservaRequest request, Long id) {
+        return null;
+    }
+
+    @Override
+    public ReservaResponse actualizarReserva(ActualizarReservaRequest request, Long id) {
         Reserva reserva = obtenerReserva(id);
-
-        validarActualizacion(request,reserva);
-        //obtener la habitación
-        //obtener el huesped
-
-        //comprobar si el huesped ya tiene reservas asignadas
 
         log.info("Actualizando reserva con id: {}...", id);
 
-        // los ultimos 2 null los voy a obtener de la habitación
         reserva.actualizar(
-                request.idHuesped(),
-                request.idHabitacion(),
                 request.fechaEntrada(),
-                request.fechaSalida(),
-                request.numeroPersonas(),
-                null,
-                null
+                request.fechaSalida()
         );
 
         reservaRepository.saveAndFlush(reserva);
 
         log.info("Reserva actualizada exitosamente");
-        //TODO enviar el entidad a response que tiene los datos del huesped y los de la habitacion
         return reservaMapper.entidadAResponse(reserva);
     }
 
@@ -86,8 +86,8 @@ public class ReservaServiceImpl implements ReservaService{
     @Override
     @Transactional(readOnly = true)
     public ReservaResponse obtenerPorId(Long id) {
-        //TODO ENVIAR EL ENTIDAD A RESPONSE CON LOS DATOS DEL HUESPED Y EL CUARTO
-        return reservaMapper.entidadAResponse(obtenerReserva(id));
+        Reserva reserva = obtenerReserva(id);
+        return reservaMapper.entidadAResponse(reserva);
     }
 
     @Override
@@ -95,10 +95,12 @@ public class ReservaServiceImpl implements ReservaService{
         log.info("Registrando la reserva...");
         //traer la habitacion
         //Validar habitacion disponible
-        //traer el huesped
-        //validar si el huesped tiene reservas
 
-        Reserva reserva = reservaMapper.requestAEntidad(request);
+        validarHuespedNoTieneReservas(request.idHuesped());
+
+        HuespedResponse huesped =  obtenerHuespedResponse(request.idHuesped());
+
+        Reserva reserva = reservaMapper.requestAEntidad(request, huesped);
 
         reservaRepository.saveAndFlush(reserva);
 
@@ -133,30 +135,16 @@ public class ReservaServiceImpl implements ReservaService{
                 orElseThrow(()-> new RecursoNoEncontradoException("La reserva no existe."));
     }
 
-    private void validarActualizacion(ReservaRequest reservaRequest, Reserva reserva){
+    private HuespedResponse obtenerHuespedResponse(Long id){
+        log.info("Obteniendo el Huesped response...");
 
-        // validamos que ni habitacion ni huesped cambien
-        if(reservaRequest.idHabitacion()!=reserva.getIdHabitacion())
-            throw new ConflictoException("No se puede cambiar la habitación de la reserva.");
-
-        if(reservaRequest.idHuesped()!=reserva.getIdHuesped())
-            throw new ConflictoException("No se puede cambiar el responsable de la reserva.");
-
-        //numero de personas no puede cambiar si ya esta confirmada, si cambian las fechas se ignora si se puede
-        if(reserva.getEstadoReserva()==CONFIRMADA && reserva.getNumeroPersonas()!= reservaRequest.numeroPersonas())
-            throw new ConflictoException("No se puede cambiar el número de ocupantes de la habitacion");
-
-        //Si esta en curso solo puede cambiar la fecha de salida
-        log.info("Estado reserva {}, {}<===>{} {}<===>{}",reserva.getEstadoReserva(),reserva.getNumeroPersonas(),reservaRequest.numeroPersonas(),reserva.getFechaEntrada(),reservaRequest.fechaEntrada());
-        if(reserva.getEstadoReserva()==EN_CURSO &&
-                ((!Objects.equals(reserva.getNumeroPersonas(), reservaRequest.numeroPersonas()) ||
-                        !Objects.equals(reserva.getFechaEntrada(), reservaRequest.fechaEntrada()))))
-            throw new ConflictoException("No se puede cambiar el número de ocupantes de la habitacion ni la fecha de entrada" +
-                    " si el huésped ya esta ocupando la habitación");
-
-        //ya no se puede actualizar
-        if (reserva.getEstadoReserva()==CANCELADA||reserva.getEstadoReserva()==FINALIZADA)
-            throw new ConflictoException("No se puede actualizar la reserva si esta cancelada o finalizada");
+        return huespedClient.obtenerPorId(id);
     }
 
+    private void validarHuespedNoTieneReservas(Long idHuesped){
+        log.info("Validando que el huesped no tenga reservas en estado {}",estadosNoValidosHuesped);
+
+        if(reservaRepository.existsByIdHuespedAndEstadoRegistroAndEstadoReservaIn(idHuesped,EstadoRegistro.ACTIVO,estadosNoValidosHuesped))
+            throw new ConflictoException("El húesped ya tiene una reservación confirmada o en curso.");
+    }
 }

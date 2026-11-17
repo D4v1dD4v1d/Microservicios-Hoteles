@@ -76,6 +76,8 @@ public class CrudController<RQ, RS, S extends CrudService<RQ,RS>> {
         validarIdNotNullPositive(id);
         return ResponseEntity.ok(service.actualizar(request,id));
     }
+
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar un recurso")
     @ApiResponse(responseCode = "204", description = "Recurso eliminado")

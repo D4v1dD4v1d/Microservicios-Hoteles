@@ -4,7 +4,6 @@ import com.david.commons.dto.habitaciones.DatosHabitacion;
 import com.david.commons.dto.huespedes.DatosHuesped;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.List;
 
 @Schema(description = "Datos de una reserva")
 public record ReservaResponse(
@@ -17,7 +16,7 @@ public record ReservaResponse(
         @Schema(description = "Número de personas que ingresarán al hotel")
         Short numeroPesronas,
         @Schema(description = "Dato del huéspede")
-        DatosHuesped datosHuespede,
+        DatosHuesped datosHuesped,
         @Schema(description = "Datos de la habitación")
         DatosHabitacion datosHabitacion,
         @Schema(description = "Monto total de la reserva")
