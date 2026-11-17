@@ -26,7 +26,7 @@ public class HuespedServiceImpl implements HuespedService{
 
     private final HuespedMapper huespedMapper;
 
-    private final ReservaClient reservaClient;
+    //private final ReservaClient reservaClient;
 
     @Override
     public HuespedResponse obtenerHuespedPorIdSinEstado(Long id) {

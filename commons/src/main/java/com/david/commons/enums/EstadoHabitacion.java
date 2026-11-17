@@ -1,6 +1,6 @@
-package com.leonardo.habitacion.enums;
+package com.david.commons.enums;
 
-public enum Estado {
+public enum EstadoHabitacion {
     DISPONIBLE,
     OCUPADA,
     LIMPIEZA,

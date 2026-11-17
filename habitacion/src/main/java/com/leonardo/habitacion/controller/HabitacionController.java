@@ -1,7 +1,8 @@
 package com.leonardo.habitacion.controller;
 
-import com.leonardo.habitacion.dto.HabitacionRequest;
-import com.leonardo.habitacion.dto.HabitacionResponse;
+
+import com.david.commons.dto.habitaciones.HabitacionRequest;
+import com.david.commons.dto.habitaciones.HabitacionResponse;
 import com.leonardo.habitacion.service.HabitacionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/")
 @RequiredArgsConstructor
 @Tag(name = "Habitaciones", description = "Administración de habitaciones del hotel")
 public class HabitacionController {

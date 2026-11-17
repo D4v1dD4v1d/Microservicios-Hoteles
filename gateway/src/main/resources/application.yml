@@ -11,24 +11,24 @@ spring:
           x-forwarded:
             prefix-enabeled: true
           routes:
-            - id: ruta-medicos
-              uri: lb://medicos
+            - id: ruta-reservas
+              uri: lb://reservas
               predicates:
-                - Path=/api/medicos/**
+                - Path=/api/reservas/**
               filters:
                 - StripPrefix=2
 
-            - id: ruta-citas
-              uri: lb://citas
+            - id: ruta-habitaciones
+              uri: lb://habitaciones
               predicates:
-                - Path=/api/citas/**
+                - Path=/api/habitaciones/**
               filters:
                 - StripPrefix=2
 
-            - id: ruta-pacientes
-              uri: lb://pacientes
+            - id: ruta-huespedes
+              uri: lb://huespedes
               predicates:
-                - Path=/api/pacientes/**
+                - Path=/api/huespedes/**
               filters:
                 - StripPrefix=2
     loadbalancer:

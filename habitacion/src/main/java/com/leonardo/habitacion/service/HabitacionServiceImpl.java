@@ -1,12 +1,12 @@
 package com.leonardo.habitacion.service;
 
-import com.leonardo.habitacion.dto.HabitacionRequest;
-import com.leonardo.habitacion.dto.HabitacionResponse;
+
+import com.david.commons.dto.habitaciones.HabitacionRequest;
+import com.david.commons.dto.habitaciones.HabitacionResponse;
+import com.david.commons.enums.EstadoRegistro;
 import com.leonardo.habitacion.entity.Habitacion;
-import com.leonardo.habitacion.enums.EstadoRegistro;
 import com.leonardo.habitacion.mapper.HabitacionMapper;
 import com.leonardo.habitacion.repository.HabitacionRepository;
-import com.leonardo.habitacion.service.HabitacionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +21,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class HabitacionServiceImpl implements HabitacionService {
 
     private final HabitacionRepository habitacionRepository;
     private final HabitacionMapper habitacionMapper;
 
     @Override
-    @Transactional
     public HabitacionResponse registrar(HabitacionRequest request) {
 
         log.info("Registrando habitación número: {}", request.numero());
@@ -65,7 +65,6 @@ public class HabitacionServiceImpl implements HabitacionService {
     }
 
     @Override
-    @Transactional
     public HabitacionResponse actualizar(Long idHabitacion, HabitacionRequest request) {
 
         log.info("Actualizando habitación con ID: {}", idHabitacion);
