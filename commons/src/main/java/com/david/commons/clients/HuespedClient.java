@@ -9,5 +9,4 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface HuespedClient {
     @GetMapping("/{id}")
     HuespedResponse obtenerPorId(@PathVariable Long id);
-
 }

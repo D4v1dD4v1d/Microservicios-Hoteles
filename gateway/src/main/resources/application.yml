@@ -25,10 +25,10 @@ spring:
               filters:
                 - StripPrefix=2
 
-            - id: ruta-huespedes
-              uri: lb://huespedes
+            - id: ruta-huesped
+              uri: lb://huesped
               predicates:
-                - Path=/api/huespedes/**
+                - Path=/api/huesped/**
               filters:
                 - StripPrefix=2
     loadbalancer:

@@ -65,4 +65,5 @@ public class HabitacionController {
 
         return ResponseEntity.noContent().build();
     }
+
 }

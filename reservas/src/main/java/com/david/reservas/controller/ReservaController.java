@@ -61,4 +61,28 @@ public class ReservaController extends CrudController<ReservaRequest, ReservaRes
         return ResponseEntity.ok(service.actualizarReserva(request,id));
     }
 
+    @ApiResponse(responseCode = "204", description = "El húesped no tiene reservas asignadas")
+    @ApiResponse(responseCode = "409", description = "Húesped tiene reservas asignadas y no se puede modificar ni eliminar",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemaDoc.class)))
+    @GetMapping("/id-huesped/{idHuesped}/reservas-asignadas")
+    public ResponseEntity<Void> huespedTieneReservasAsignadas(
+            @Parameter(description = "Id del húesped", example = "1")
+            @PathVariable @Positive(message = "El idHuesped debe ser positivo") Long idHuesped){
+        service.huespedTieneReservasAsignadas(idHuesped);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponse(responseCode = "204", description = "La habitación no tiene reservas asignadas")
+    @ApiResponse(responseCode = "409", description = "La habitación tiene reservas asignadas y no se puede modificar ni eliminar",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemaDoc.class)))
+    @GetMapping("/id-habitacion/{idhabitacion}/reservas-asignadas")
+    public ResponseEntity<Void> habitacionTieneReservasAsignadas(
+            @Parameter(description = "Id de la habitación", example = "1")
+            @PathVariable @Positive(message = "El idHabitacion debe ser positivo") Long idHabitacion){
+        service.habitacionTieneReservasAsignadas(idHabitacion);
+        return ResponseEntity.noContent().build();
+    }
+
 }
