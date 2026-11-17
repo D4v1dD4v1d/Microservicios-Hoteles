@@ -32,7 +32,7 @@ public class ReservaServiceImpl implements ReservaService{
     private final ReservaMapper reservaMapper;
     private final ReservaRepository reservaRepository;
 
-    private final List<EstadoReserva> estadosNoValidosHuesped = List.of(CONFIRMADA, EN_CURSO);
+    private final List<EstadoReserva> estadosNoValidos = List.of(CONFIRMADA, EN_CURSO);
 
 
     private final HuespedClient huespedClient;
@@ -114,7 +114,6 @@ public class ReservaServiceImpl implements ReservaService{
     @Override
     public void actualizarEstadoReserva(Long idReserva, Long idEstado) {
 
-
         Reserva reserva = obtenerReserva(idReserva);
 
         log.info("Actualizando estado de la reserva con id: {}", idReserva);
@@ -126,6 +125,26 @@ public class ReservaServiceImpl implements ReservaService{
 
         log.info("Estado de la reserva {} actualizado", reserva);
 
+    }
+
+    @Override
+    public void huespedTieneReservasAsignadas(Long idHuesped){
+        if (reservaRepository.existsByIdHuespedAndEstadoRegistroAndEstadoReservaIn(
+                idHuesped,
+                EstadoRegistro.ACTIVO,
+                estadosNoValidos))
+            throw new ConflictoException("No se puede modificar o eliminar el Huésped por que tiene reservas en " +
+                    "estad " + estadosNoValidos);
+    }
+
+    @Override
+    public void habitacionTieneReservasAsignadas(Long idHabitacion) {
+        if (reservaRepository.existsByIdHabitacionAndEstadoRegistroAndEstadoReservaIn(
+                idHabitacion,
+                EstadoRegistro.ACTIVO,
+                estadosNoValidos))
+            throw new ConflictoException("No se puede modificar o eliminar el Huésped por que tiene reservas en " +
+                    "estad " + estadosNoValidos);
     }
 
     private Reserva obtenerReserva(Long id){
@@ -142,9 +161,11 @@ public class ReservaServiceImpl implements ReservaService{
     }
 
     private void validarHuespedNoTieneReservas(Long idHuesped){
-        log.info("Validando que el huesped no tenga reservas en estado {}",estadosNoValidosHuesped);
+        log.info("Validando que el huesped no tenga reservas en estado {}",estadosNoValidos);
 
-        if(reservaRepository.existsByIdHuespedAndEstadoRegistroAndEstadoReservaIn(idHuesped,EstadoRegistro.ACTIVO,estadosNoValidosHuesped))
+        if(reservaRepository.existsByIdHuespedAndEstadoRegistroAndEstadoReservaIn(idHuesped,EstadoRegistro.ACTIVO,estadosNoValidos))
             throw new ConflictoException("El húesped ya tiene una reservación confirmada o en curso.");
     }
+
+
 }
