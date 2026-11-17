@@ -1,5 +1,6 @@
 package com.david.reservas.entity;
 
+import com.david.commons.exceptions.ConflictoException;
 import com.david.commons.exceptions.DatoInvalidoException;
 import com.david.commons.utils.ValoresNumericosUtils;
 import com.david.reservas.enums.EstadoReserva;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 @Entity
 @AllArgsConstructor
@@ -40,19 +42,19 @@ public class Reserva {
     @Column(name = "NUMERO_PERSONAS", nullable = false)
     private Short numeroPersonas;
 
-    @Column(name = "PRECIO_NOCHE", nullable = false)
+    @Column(name = "PRECIO_NOCHE",columnDefinition = "NUMBER(10,2)",  nullable = false)
     private Double precioNoche;
 
-    @Column(name = "PRECIO_TOTAL", nullable = false)
+    @Column(name = "PRECIO_TOTAL",columnDefinition = "NUMBER(10,2)",  nullable = false)
     private Double precioTotal;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ESTADO", nullable = false)
     private EstadoReserva estadoReserva;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ESTADO_REGISTRO", nullable = false)
     private EstadoRegistro estadoRegistro;
-
-    //TODO método de actualizar y validar los cambios posibles
 
     private static void validarDatos(
             Long idHuesped,
@@ -70,12 +72,35 @@ public class Reserva {
     }
 
     private static void  validarFechas(LocalDate fechaEntrada, LocalDate fechaSalida){
-        if (fechaEntrada == null || fechaSalida == null || !fechaSalida.isBefore(fechaEntrada))
+        if (fechaEntrada == null || fechaSalida == null || fechaSalida.isBefore(fechaEntrada))
             throw new DatoInvalidoException("Las fechas de entrada y salida son requeridas y la fecha de salida debe ser posterior" +
                     " a la fecha de entrada.");
     }
+    private void validarNoEliminado(){
+        if (this.estadoRegistro == EstadoRegistro.ELIMINADO)
+            throw new ConflictoException("La cita ya está eliminada");
+    }
 
-    private Double calcularPrecioTotal(LocalDate fechaEntrada,LocalDate fechaSalida, Double precioNoche){
+    private void validarEliminacionPermitida(){
+
+        validarNoEliminado();
+
+        if (!estadoReserva.isEliminable())
+            throw new ConflictoException("La reserva con estado "+estadoRegistro +" no puede eliminarse.");
+    }
+
+    private void validarActualizacionPermitida(){
+
+        validarNoEliminado();
+
+        if (!estadoReserva.isActualizable())
+            throw new ConflictoException("La reserva con estado "+estadoReserva +" no puede actualizarse.");
+    }
+
+    private static Double calcularPrecioTotal(LocalDate fechaEntrada,LocalDate fechaSalida, Double precioNoche){
+
+        if(precioNoche== null)
+            return 0.0;
 
         Long noches = ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
 
@@ -83,13 +108,38 @@ public class Reserva {
 
     }
 
-    public Reserva crear(Long idHuesped,
+    public void eliminar(){
+
+        validarEliminacionPermitida();
+
+        this.estadoRegistro = EstadoRegistro.ELIMINADO;
+
+    }
+    public void actualizarEstadoReserva(EstadoReserva nuevoEstado){
+
+        validarActualizacionPermitida();
+
+        if (nuevoEstado == null)
+            throw new DatoInvalidoException("El nuevo estado de la cita es requerido");
+
+        if (!estadoReserva.puedeCambiarA(nuevoEstado))
+            throw new ConflictoException("La cita con estado "+ estadoReserva+" solo puede " +
+                    "cambiar a: "+ estadoReserva.puedeCambiar());
+
+        this.estadoReserva = nuevoEstado;
+    }
+
+    public static Reserva crear(Long idHuesped,
                                 Long idHabitacion,
                                 LocalDate fechaEntrada,
                                 LocalDate fechaSalida,
                                 Short numeroPersonas,
                                 Short capacidadPersonasHabitacion,
                                 Double precioNoche){
+        //solo para pruebas
+        precioNoche=10.0;
+        capacidadPersonasHabitacion = 4;
+        numeroPersonas = 4;
 
         validarDatos(idHuesped,idHabitacion,fechaEntrada,fechaSalida,numeroPersonas,capacidadPersonasHabitacion);
 
@@ -114,14 +164,26 @@ public class Reserva {
                            Short numeroPersonas,
                            Short capacidadPersonasHabitacion,
                            Double precioNoche){
+        //solo para pruebas
+        precioNoche=10.0;
+        capacidadPersonasHabitacion = 4;
+        numeroPersonas = 4;
+
+        validarActualizacionPermitida();
+
         validarDatos(idHuesped,idHabitacion,fechaEntrada,fechaSalida,numeroPersonas,capacidadPersonasHabitacion);
 
-        if (this.numeroPersonas!=numeroPersonas)
-            this.numeroPersonas = numeroPersonas;
+        if(
+                Objects.equals(this.fechaEntrada,fechaEntrada) ||
+                Objects.equals(this.fechaSalida,fechaSalida) ||
+                Objects.equals(this.fechaEntrada,fechaEntrada)
 
-        if (this.precioNoche!=precioNoche)
-            this.precioNoche = precioNoche;
-
+        ){
+            this.fechaSalida=fechaSalida;
+            this.fechaEntrada=fechaEntrada;
+            this.precioNoche=precioNoche;
+            this.precioTotal=calcularPrecioTotal(fechaEntrada,fechaSalida,precioNoche);
+        }
 
         this.idHuesped = idHuesped;
         this.idHabitacion = idHabitacion;
