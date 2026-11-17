@@ -1,11 +1,11 @@
 
 package com.leonardo.habitacion.mapper;
 
-import com.leonardo.habitacion.dto.HabitacionRequest;
-import com.leonardo.habitacion.dto.HabitacionResponse;
+import com.david.commons.dto.habitaciones.HabitacionRequest;
+import com.david.commons.dto.habitaciones.HabitacionResponse;
+import com.david.commons.enums.EstadoRegistro;
 import com.leonardo.habitacion.entity.Habitacion;
-import com.leonardo.habitacion.enums.Estado;
-import com.leonardo.habitacion.enums.EstadoRegistro;
+import com.david.commons.enums.EstadoHabitacion;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,7 +18,7 @@ public class HabitacionMapper {
                 .tipo(request.tipo())
                 .precio(request.precio())
                 .capacidad(request.capacidad())
-                .estado(Estado.DISPONIBLE)
+                .estado(EstadoHabitacion.DISPONIBLE)
                 .estadoRegistro(EstadoRegistro.ACTIVO)
                 .build();
     }

@@ -1,8 +1,8 @@
 
-package com.leonardo.habitacion.dto;
+package com.david.commons.dto.habitaciones;
 
-import com.leonardo.habitacion.enums.Estado;
-import com.leonardo.habitacion.enums.EstadoRegistro;
+import com.david.commons.enums.EstadoHabitacion;
+import com.david.commons.enums.EstadoRegistro;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Información de una habitación registrada")
@@ -24,7 +24,7 @@ public record HabitacionResponse(
         Short capacidad,
 
         @Schema(description = "Estado actual de la habitación", example = "DISPONIBLE")
-        Estado estado,
+        EstadoHabitacion estado,
 
         @Schema(description = "Estado de registro de la habitación", example = "ACTIVO")
         EstadoRegistro estadoRegistro

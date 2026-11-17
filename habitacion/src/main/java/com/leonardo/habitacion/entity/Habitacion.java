@@ -1,8 +1,8 @@
 
 package com.leonardo.habitacion.entity;
 
-import com.leonardo.habitacion.enums.Estado;
-import com.leonardo.habitacion.enums.EstadoRegistro;
+import com.david.commons.enums.EstadoHabitacion;
+import com.david.commons.enums.EstadoRegistro;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,7 +41,7 @@ public class Habitacion {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ESTADO", length = 30, nullable = false)
-    private Estado estado;
+    private EstadoHabitacion estado;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ESTADO_REGISTRO", length = 30, nullable = false)
