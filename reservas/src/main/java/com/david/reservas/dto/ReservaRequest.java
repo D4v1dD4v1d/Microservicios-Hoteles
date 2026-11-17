@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Schema(description = "Datos para registrar una reserva")
 public record ReservaRequest(
         @Schema(description = "Identificador del paciente", example = "1")
         @NotNull(message = "El id de paciente es requerido")
@@ -20,7 +21,7 @@ public record ReservaRequest(
 
         @Schema(
                 description = "Fecha de entrada programada para la reserva. Debe ser una fecha presente o futura",
-                example = "2026/09/27",
+                example = "2026/09/17",
                 type = "string",
                 format = "date")
         @NotNull(message = "La fecha de entrada es requerido")

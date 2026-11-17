@@ -20,7 +20,7 @@ public class OpenApiConfig {
                             .description("API para la gestión de habitaciones"))
                     .servers(List.of(
                             new Server()
-                                    .url("http://localhost:8080/api/habitaciones")
+                                    .url("http://localhost:8080/api/habitacion")
                                     .description("Servidor de API gateway"),
                             new Server()
                                     .url("http://localhost:8082")
