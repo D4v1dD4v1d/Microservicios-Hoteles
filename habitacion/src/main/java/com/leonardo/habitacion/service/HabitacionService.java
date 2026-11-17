@@ -1,8 +1,10 @@
 
 package com.leonardo.habitacion.service;
 
-import com.leonardo.habitacion.dto.HabitacionRequest;
-import com.leonardo.habitacion.dto.HabitacionResponse;
+
+
+import com.david.commons.dto.habitaciones.HabitacionRequest;
+import com.david.commons.dto.habitaciones.HabitacionResponse;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.leonardo.habitacion.repository;
 
+import com.david.commons.enums.EstadoRegistro;
 import com.leonardo.habitacion.entity.Habitacion;
-import com.leonardo.habitacion.enums.EstadoRegistro;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
