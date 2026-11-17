@@ -7,7 +7,7 @@ import com.david.huespedes.entity.Huesped;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HuespedMapper implements CommonMapper<HuespedRequest, HuespedResponse, Huesped> {
+public class HuespedMapper implements CommonMapper<HuespedRequest, Huesped, HuespedResponse> {
 
     @Override
     public Huesped requestAEntidad(HuespedRequest request) {

@@ -1,9 +1,9 @@
 package com.david.huespedes.service;
 
-import com.david.commons.clients.ReservaClient;
 import com.david.commons.dto.huespedes.HuespedRequest;
 import com.david.commons.dto.huespedes.HuespedResponse;
 import com.david.commons.enums.EstadoRegistro;
+import com.david.commons.enums.TipoDocumento;
 import com.david.commons.exceptions.ConflictoException;
 import com.david.commons.exceptions.RecursoNoEncontradoException;
 import com.david.huespedes.entity.Huesped;
@@ -37,27 +37,27 @@ public class HuespedServiceImpl implements HuespedService{
                 )
         ));
     }
-/*
+
     @Override
-    public void actualizarEstadoResgistroHuesped(Long id) {
+    public void actualizarTipoDocumento(Long id, Long idTipoMedico) {
         Huesped huesped = obtenerHuespedActivoPorId(id);
 
         log.info("Actualizando estado registro de huesped con ID: {}", id);
 
-        EstadoRegistro nuevoEstado = EstadoR;
+        TipoDocumento nuevoTipoDocumento = TipoDocumento.obtenerTipoDocumentoPorCodigo(idTipoMedico);
 
-        DisponibilidadMedico disponibilidadAnterior = medico.getDisponibilidad();
+        TipoDocumento tipoDocumentoAnt = huesped.getTipoDocumento();
 
-        medico.actualizarDisponibilidad(nuevaDisponibilidad);
+        huesped.actualizarTipoDocumento(nuevoTipoDocumento);
 
-        medicoRepository.saveAndFlush(medico);
+        huespedRepository.saveAndFlush(huesped);
 
-        log.info("Disponibilidad del medico con ID {} cambio de {} a {}",
-                idMedico, disponibilidadAnterior, nuevaDisponibilidad
+        log.info("Tipo de documento del huesped con ID {} cambio de {} a {}",
+                id, tipoDocumentoAnt, nuevoTipoDocumento
         );
     }
 
- */
+
 
     @Override
     @Transactional(readOnly = true)
@@ -77,7 +77,7 @@ public class HuespedServiceImpl implements HuespedService{
     public HuespedResponse registrar(HuespedRequest request) {
         log.info("Registrando nuevo huesped: {}", request.nombre());
 
-       // validarDatosUnicos(request);
+        validarDatosUnicos(request);
 
         Huesped huesped = huespedMapper.requestAEntidad(request);
 
@@ -92,9 +92,9 @@ public class HuespedServiceImpl implements HuespedService{
     public HuespedResponse actualizar(HuespedRequest request, Long id) {
         Huesped huesped = obtenerHuespedActivoPorId(id);
 
-        //validarHuespedTieneReservacionAgendada(id);
+        validarHuespedTieneReservacionAgendada(id);
 
-        //validarCambiosUnicos(request, id);
+        validarCambiosUnicos(request, id);
 
         log.info("Actualizando huesped con ID: {}", id);
 
@@ -104,8 +104,9 @@ public class HuespedServiceImpl implements HuespedService{
                 request.email(),
                 request.telefono(),
                 request.nacionalidad(),
-                request.tipoDocumento(),
-                request.numeroDocumento());
+                TipoDocumento.obtenerTipoDocumentoPorCodigo(request.idTipoDocumento()),
+                request.numeroDocumento()
+        );
 
         huespedRepository.saveAndFlush(huesped);
 
@@ -120,7 +121,7 @@ public class HuespedServiceImpl implements HuespedService{
 
         log.info("Elimar huesped con ID: {}", id);
 
-        //ReservaClient.validarEliminacionHuesped(id);
+        ReservaClient.validarEliminacionHuesped(id);
 
         huesped.eliminar();
 
@@ -191,11 +192,12 @@ public class HuespedServiceImpl implements HuespedService{
                             + request.numeroDocumento()
             );
     }
-/*
+
     private void validarHuespedTieneReservacionAgendada(Long id){
         log.info("Validando si el huesped con ID: {}"+
                 "tiene reservacion/es agendadas", id);
 
-        reservaClient.huespedTieneCitasAsignadas(id);
-    }*/
+        reservaClient.huespedTieneReservasAgendadas(id);
+    }
+
 }

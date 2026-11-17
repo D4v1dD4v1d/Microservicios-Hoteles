@@ -1,6 +1,7 @@
 package com.david.huespedes.entity;
 
 import com.david.commons.exceptions.ConflictoException;
+import com.david.commons.exceptions.DatoInvalidoException;
 import com.david.commons.utils.StringCustomUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -77,10 +78,20 @@ public class Huesped {
         StringCustomUtils.validarTamanio(numeroDocumento, 8, 20,
                 "El número de documento es obligatorio y debe contener entre 8 y 20 caracteres");
     }
-    /*public void validarNoEliminado(){
+
+    public void validarNoEliminado(){
         if (this.estadoRegistro == EstadoRegistro.ELIMINADO)
-            throw new ConflictoException("El paciente ya esta eliminado");
-    }*/
+            throw new ConflictoException("El huesped ya esta eliminado");
+    }
+
+    public void actualizarTipoDocumento(TipoDocumento tipoDocumento){
+        validarNoEliminado();
+
+        if(tipoDocumento == null)
+            throw new DatoInvalidoException("El estado de registro es requerida");
+
+        this.tipoDocumento = tipoDocumento;
+    }
 
     public void actualizar(String nombre,String apellidos, String email,String telefono,
                            String nacionalidad, TipoDocumento tipoDocumento, String numeroDocumento){
