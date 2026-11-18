@@ -7,7 +7,7 @@ import com.david.huespedes.entity.Huesped;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HuespedMapper implements CommonMapper<HuespedRequest,Huesped, HuespedResponse> {
+public class HuespedMapper implements CommonMapper<HuespedRequest, Huesped, HuespedResponse> {
 
     @Override
     public Huesped requestAEntidad(HuespedRequest request) {
@@ -18,7 +18,6 @@ public class HuespedMapper implements CommonMapper<HuespedRequest,Huesped, Huesp
                 request.apellidos(),
                 request.email(),
                 request.telefono(),
-                request.tipoDocumento(),
                 request.nacionalidad(),
                 request.numeroDocumento()
                 );
@@ -33,7 +32,7 @@ public class HuespedMapper implements CommonMapper<HuespedRequest,Huesped, Huesp
                         entidad.obtenerNombreCompleto(),
                         entidad.getEmail(),
                         entidad.getTelefono(),
-                        entidad.getTipoDocumento().name(),
+                        entidad.getTipoDocumento().getDescripcion(),
                         entidad.getNumeroDocumento(),
                         entidad.getNacionalidad(),
                         entidad.getEstadoRegistro().name());

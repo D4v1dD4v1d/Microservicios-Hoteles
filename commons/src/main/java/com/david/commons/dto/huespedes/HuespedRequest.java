@@ -37,7 +37,8 @@ public record HuespedRequest(
 
         @Schema(description = "Tipo de documento proporcionado del huesped", example = "INE")
         @NotNull(message = "El tipo de documento es requerido")
-        TipoDocumento tipoDocumento,
+        @Positive(message = "El id del tipo de documento debe ser positivo")
+        Long idTipoDocumento,
 
         @Schema(description = "Nacionalidad del huesped", example = "Mexicano")
         @NotBlank(message = "La nacionalidad es requerida")

@@ -39,22 +39,23 @@ public class HuespedController extends CrudController<HuespedRequest, HuespedRes
         return ResponseEntity.ok(service.obtenerHuespedPorIdSinEstado(id));
     }
 
-    /*
-    @PutMapping("/{id}/disponibilidad/{idDisponibilidad}")
-    @Operation(summary = "Actualizar disponibilidad del médico" +
-            "(no es endpoint libre, debe gestionarlo el sistema de Citas)")
-    @ApiResponse(responseCode = "204", description = "Disponibilidad del médico actualizada")
-    @ApiResponse(responseCode = "409", description = "La disponibilidad del médico no puede " +
+    @PutMapping("/{id}/tipoDocumento/{idTipoDocumento}")
+    @Operation(summary = "Actualizar el tipo de documento" +
+            "(no es endpoint libre, debe gestionarlo el sistema de Reservas)")
+    @ApiResponse(responseCode = "204", description = "Tipo de documento actualizado")
+    @ApiResponse(responseCode = "409", description = "El tipo de documento no puede " +
             "actualizarse por regla de negocio",
             content = @Content(mediaType = "application/problem+json",
                     schema = @Schema(implementation = ProblemaDoc.class)))
-    public ResponseEntity<Void> actualizarEstadoRegistro(
-            @PathVariable @Positive(message = "El idMedico debe ser positivo") Long idMedico,
-            @PathVariable @Positive(message = "El idDisponibilidad debe ser positivo") Long idDisponibilidad
+    public ResponseEntity<Void> actualizarTipoDocumento(
+            @PathVariable @Positive(message = "El id del huesped debe ser positivo") Long id,
+            @PathVariable @Positive(message = "El id del TIpo de documento debe ser positivo") Long idTipoDocumento
     ) {
-        service.actualizarDisponibilidadMedico(idMedico, idDisponibilidad);
+        service.actualizarTipoDocumento(id, idTipoDocumento);
         return ResponseEntity.noContent().build();
     }
-    */
+
+
+
 
 }
