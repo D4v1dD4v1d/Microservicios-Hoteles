@@ -9,5 +9,5 @@ public interface HuespedService extends CrudService<HuespedRequest , HuespedResp
 
     HuespedResponse obtenerHuespedPorIdSinEstado(Long id);
 
-    //void actualizarEstadoResgistroHuesped(Long id);
+    void actualizarTipoDocumento(Long id, Long idTipoDocumento);
 }
