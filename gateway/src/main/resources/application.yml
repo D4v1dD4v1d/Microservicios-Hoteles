@@ -11,10 +11,10 @@ spring:
           x-forwarded:
             prefix-enabeled: true
           routes:
-            - id: ruta-reservas
-              uri: lb://reservas
+            - id: ruta-reserva
+              uri: lb://reserva
               predicates:
-                - Path=/api/reservas/**
+                - Path=/api/reserva/**
               filters:
                 - StripPrefix=2
 
