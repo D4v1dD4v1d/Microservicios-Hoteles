@@ -18,8 +18,8 @@ spring:
               filters:
                 - StripPrefix=2
 
-            - id: ruta-habitaciones
-              uri: lb://habitaciones
+            - id: ruta-habitacion
+              uri: lb://habitacion
               predicates:
                 - Path=/api/habitaciones/**
               filters:
