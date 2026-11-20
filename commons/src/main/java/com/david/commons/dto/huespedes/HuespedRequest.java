@@ -1,6 +1,5 @@
 package com.david.commons.dto.huespedes;
 
-import com.david.commons.enums.TipoDocumento;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
@@ -35,7 +34,7 @@ public record HuespedRequest(
         @Size(min = 1, max = 50, message = "El numero de documento debe tener entre 1 y 50 caracteres")
         String numeroDocumento,
 
-        @Schema(description = "Tipo de documento proporcionado del huesped", example = "INE")
+        @Schema(description = "Tipo de documento proporcionado del huesped", example = "2")
         @NotNull(message = "El tipo de documento es requerido")
         @Positive(message = "El id del tipo de documento debe ser positivo")
         Long idTipoDocumento,

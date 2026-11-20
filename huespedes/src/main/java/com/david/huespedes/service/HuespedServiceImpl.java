@@ -122,7 +122,7 @@ public class HuespedServiceImpl implements HuespedService{
 
         log.info("Elimar huesped con ID: {}", id);
 
-        //ReservaClient.validarEliminacionHuesped(id);
+        validarHuespedTieneReservacionAgendada(id);
 
         huesped.eliminar();
 
