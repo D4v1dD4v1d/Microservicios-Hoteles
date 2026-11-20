@@ -74,7 +74,7 @@ public class Reserva {
 
     private static void  validarFechas(LocalDate fechaEntrada, LocalDate fechaSalida){
 
-        if (fechaEntrada == null || fechaSalida == null || fechaSalida.isBefore(fechaEntrada))
+        if (fechaEntrada == null || fechaSalida == null || fechaSalida.isBefore(fechaEntrada) || fechaEntrada.equals(fechaSalida))
             throw new DatoInvalidoException("Las fechas de entrada y salida son requeridas y la fecha de salida debe ser posterior" +
                     " a la fecha de entrada.");
     }
@@ -83,7 +83,7 @@ public class Reserva {
     private void validarNoEliminado(){
 
         if (this.estadoRegistro == EstadoRegistro.ELIMINADO)
-            throw new ConflictoException("La cita ya está eliminada");
+            throw new ConflictoException("La reserva ya está eliminada");
     }
 
     private void validarEliminacionPermitida(){
