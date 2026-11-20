@@ -35,7 +35,7 @@ public record HuespedRequest(
         @Size(min = 1, max = 50, message = "El numero de documento debe tener entre 1 y 50 caracteres")
         String numeroDocumento,
 
-        @Schema(description = "Id tipo de documento proporcionado del huesped", example = "2")
+        @Schema(description = "Id ipo de documento proporcionado del huesped", example = "2")
         @NotNull(message = "El id tipo de documento es requerido")
         @Positive(message = "El id del tipo de documento debe ser positivo")
         Long idTipoDocumento,
