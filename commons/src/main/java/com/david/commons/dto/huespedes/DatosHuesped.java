@@ -18,9 +18,6 @@ public record DatosHuesped(
         String numeroDocumento,
 
         @Schema(description = "Nacionalidad del huesped", example = "Mexicano")
-        String nacionalidad,
-
-        @Schema(description = "Estado de registro del huesped", example = "ACTIVO")
-        String estadoRegistro
+        String nacionalidad
 ) {
 }

@@ -1,10 +1,8 @@
 package com.david.huespedes.service;
 
 import com.david.commons.clients.ReservaClient;
-import com.david.commons.dto.habitaciones.RestriccionesReservaHabitacion;
 import com.david.commons.dto.huespedes.HuespedRequest;
 import com.david.commons.dto.huespedes.HuespedResponse;
-import com.david.commons.enums.EstadoHabitacion;
 import com.david.commons.enums.EstadoRegistro;
 import com.david.commons.enums.TipoDocumento;
 import com.david.commons.exceptions.ConflictoException;
@@ -12,8 +10,6 @@ import com.david.commons.exceptions.RecursoNoEncontradoException;
 import com.david.huespedes.entity.Huesped;
 import com.david.huespedes.mapper.HuespedMapper;
 import com.david.huespedes.repositories.HuespedRepository;
-import com.david.reservas.enums.EstadoReserva;
-import com.david.reservas.repository.ReservaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,6 +57,8 @@ public class HuespedServiceImpl implements HuespedService{
                 id, tipoDocumentoAnt, nuevoTipoDocumento
         );
     }
+
+
 
     @Override
     @Transactional(readOnly = true)
@@ -124,7 +122,7 @@ public class HuespedServiceImpl implements HuespedService{
 
         log.info("Elimar huesped con ID: {}", id);
 
-        reservaClient.validarEliminacionHuespedConReserva(id);
+        validarHuespedTieneReservacionAgendada(id);
 
         huesped.eliminar();
 
@@ -203,9 +201,5 @@ public class HuespedServiceImpl implements HuespedService{
         reservaClient.huespedTieneReservasAsignadas(id);
     }
 
-    private void validarEliminacionHuespedConReserva(Long idHuesped){
-        log.info("Validando que el huesped no tenga reservas en estado de CONFIRMADA O EN CURSO ");
 
-        reservaClient.validarEliminacionHuespedConReserva(idHuesped);
-    }
 }

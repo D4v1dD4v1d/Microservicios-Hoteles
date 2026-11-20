@@ -8,14 +8,14 @@ import com.david.commons.mapper.CommonMapper;
 import com.david.reservas.dto.ReservaRequest;
 import com.david.reservas.dto.ReservaResponse;
 import com.david.reservas.entity.Reserva;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-//TODO OBTENER DATOS HUESPEDES Y DATOS HABITACION DE COMMONS
 @Component
-public class ReservaMapper implements CommonMapper<ReservaRequest,Reserva,ReservaResponse>{
+@Slf4j
+public class ReservaMapper  {
 
-    @Override
-    public Reserva requestAEntidad(ReservaRequest request) {
+    public Reserva requestAEntidad(ReservaRequest request, HabitacionResponse datosHabitacion) {
         return request == null
                 ? null
                 : Reserva.crear(
@@ -24,52 +24,32 @@ public class ReservaMapper implements CommonMapper<ReservaRequest,Reserva,Reserv
                 request.fechaEntrada(),
                 request.fechaSalida(),
                 request.numeroPersonas(),
-                null,
-                null);
+                datosHabitacion.capacidad(),
+                datosHabitacion.precio());
     }
 
-    public Reserva requestAEntidad(ReservaRequest request, HuespedResponse huespedResponse) {
-        return request == null
-                ? null
-                : Reserva.crear(
-                request.idHuesped(),
-                request.idHabitacion(),
-                request.fechaEntrada(),
-                request.fechaSalida(),
-                request.numeroPersonas(),
-                null,
-                null);
-    }
+    public ReservaResponse entidadAResponse(Reserva entidad, HuespedResponse huesped, HabitacionResponse habitacion) {
+        if (entidad == null) {
+            return null;
+        }
 
+        if (habitacion != null) {
+            log.info("id {}", habitacion.idHabitacion());
+        }
 
-    @Override
-    public ReservaResponse entidadAResponse(Reserva entidad) {
-        return entidad == null
-                ? null
-                : new ReservaResponse(
+        return new ReservaResponse(
                 entidad.getId(),
                 entidad.getFechaEntrada().toString(),
                 entidad.getFechaSalida().toString(),
                 entidad.getNumeroPersonas(),
-                null,
-                null,
-                entidad.getPrecioTotal());
+                entidad.getEstadoReserva().getDescripcion(),
+                responseADatosHuesped(huesped),
+                responseADatosHabitacion(habitacion),
+                entidad.getPrecioTotal()
+        );
     }
 
-
-
-    public ReservaResponse entidadAResponse(Reserva entidad, HuespedResponse huesped, HabitacionResponse habitacion) {
-        ReservaResponse reservaResponse = entidadAResponse(entidad);
-
-       //reservaResponse.datosHabitacion().equals(responseADatosHabitacion(habitacion));
-
-        reservaResponse.datosHuesped().equals(responseADatosHuesped(huesped));
-
-        return reservaResponse;
-
-    }
-
-    private DatosHuesped responseADatosHuesped(HuespedResponse huesped){
+    private DatosHuesped responseADatosHuesped(HuespedResponse huesped) {
         return huesped == null
                 ? null
                 : new DatosHuesped(
@@ -77,22 +57,18 @@ public class ReservaMapper implements CommonMapper<ReservaRequest,Reserva,Reserv
                 huesped.telefono(),
                 huesped.tipoDocumento(),
                 huesped.numeroDocumento(),
-                huesped.nacionalidad(),
-                huesped.estadoRegistro());
+                huesped.nacionalidad());
     }
-/*
-    private DatosHabitacion responseADatosHabitacion(HabitacionResponse habitacion){
+
+    private DatosHabitacion responseADatosHabitacion(HabitacionResponse habitacion) {
+        log.info("habitacion {}", habitacion);
         return habitacion == null
                 ? null
                 : new DatosHabitacion(
                 habitacion.numero(),
                 habitacion.tipo(),
                 habitacion.precio(),
-                habitacion.precio(),
                 habitacion.capacidad(),
-                habitacion.estado()
-                );
+                habitacion.estado());
     }
-    */
-
 }

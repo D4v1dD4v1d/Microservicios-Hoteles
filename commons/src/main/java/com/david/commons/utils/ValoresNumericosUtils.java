@@ -39,6 +39,13 @@ public class ValoresNumericosUtils {
             throw new DatoInvalidoException(mensaje);
     }
 
+    public static void validadShortPositivo(Short numero, String mensaje){
+        validarNumeroRequerido(numero,mensaje);
+
+        if (numero<0)
+            throw new DatoInvalidoException(mensaje);
+    }
+
 
     public static void validadRangoShort(Short numero,Short min, Short max, String mensaje){
 

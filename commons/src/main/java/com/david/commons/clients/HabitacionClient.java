@@ -1,18 +1,17 @@
 package com.david.commons.clients;
 
-import com.david.commons.dto.habitaciones.DatosHabitacion;
-import com.david.commons.enums.EstadoHabitacion;
+import com.david.commons.dto.habitaciones.HabitacionResponse;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "habitacion")
 public interface HabitacionClient {
-    @GetMapping("/id-habitacion/{idHabitacion}")
-    DatosHabitacion obtenerDatos(@PathVariable("idHabitacion") Long idHabitacion);
+    @GetMapping("/api/habitacion/{id}")
+    HabitacionResponse obtenerPorId(@PathVariable("id") Long id);
 
-    @PatchMapping("/interno/{idHabitacion}/estado/{estado}")
-    void cambiarEstado(@PathVariable("idHabitacion") Long idHabitacion,
-                       @PathVariable("estado") EstadoHabitacion estado);
+    @PutMapping("/api/habitacion/id-habitacion/{id}/estado/{idEstado}")
+    void cambiarEstado(@PathVariable("id") Long idHabitacion,
+                       @PathVariable("idEstado") Long idEstado);
 }

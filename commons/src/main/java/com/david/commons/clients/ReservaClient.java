@@ -1,6 +1,5 @@
 package com.david.commons.clients;
 
-import com.david.commons.dto.habitaciones.RestriccionesReservaHabitacion;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,15 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "reservas")
 public interface ReservaClient {
 
-    @GetMapping("/interno/habitaciones/{idHabitacion}/restricciones")
-    RestriccionesReservaHabitacion obtenerRestricciones(@PathVariable("idHabitacion") Long idHabitacion);
 
-    @GetMapping("/id-huesped/{idHuesped}/validar-eliminacion")
-    void validarEliminacionHuespedConReserva(@PathVariable("idHuesped") Long idHuesped);
+    @GetMapping("/id-habitacion/{idHabitacion}/personas-vigente")
+    Integer personasReservaVigente(@PathVariable("idHabitacion") Long idHabitacion);
 
     @GetMapping("/id-huesped/{idHuesped}/reservas-asignadas")
     void huespedTieneReservasAsignadas(@PathVariable Long idHuesped);
-
-
-
 }

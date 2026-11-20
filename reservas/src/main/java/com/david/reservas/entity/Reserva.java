@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -43,10 +44,10 @@ public class Reserva {
     private Short numeroPersonas;
 
     @Column(name = "PRECIO_NOCHE",columnDefinition = "NUMBER(10,2)",  nullable = false)
-    private Double precioNoche;
+    private BigDecimal precioNoche;
 
     @Column(name = "PRECIO_TOTAL",columnDefinition = "NUMBER(10,2)",  nullable = false)
-    private Double precioTotal;
+    private BigDecimal precioTotal;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ESTADO", nullable = false)
@@ -72,13 +73,17 @@ public class Reserva {
     }
 
     private static void  validarFechas(LocalDate fechaEntrada, LocalDate fechaSalida){
-        if (fechaEntrada == null || fechaSalida == null || fechaSalida.isBefore(fechaEntrada))
+
+        if (fechaEntrada == null || fechaSalida == null || fechaSalida.isBefore(fechaEntrada) || fechaEntrada.equals(fechaSalida))
             throw new DatoInvalidoException("Las fechas de entrada y salida son requeridas y la fecha de salida debe ser posterior" +
                     " a la fecha de entrada.");
     }
+
+
     private void validarNoEliminado(){
+
         if (this.estadoRegistro == EstadoRegistro.ELIMINADO)
-            throw new ConflictoException("La cita ya está eliminada");
+            throw new ConflictoException("La reserva ya está eliminada");
     }
 
     private void validarEliminacionPermitida(){
@@ -97,14 +102,14 @@ public class Reserva {
             throw new ConflictoException("La reserva con estado "+estadoReserva +" no puede actualizarse.");
     }
 
-    private static Double calcularPrecioTotal(LocalDate fechaEntrada,LocalDate fechaSalida, Double precioNoche){
+    private static BigDecimal calcularPrecioTotal(LocalDate fechaEntrada,LocalDate fechaSalida, BigDecimal precioNoche){
 
         if(precioNoche== null)
-            return 0.0;
+            return BigDecimal.ZERO;
 
-        Long noches = ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
+        Double noches = (double)ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
 
-        return noches * precioNoche;
+        return precioNoche.multiply(BigDecimal.valueOf(noches));
 
     }
 
@@ -135,11 +140,7 @@ public class Reserva {
                                 LocalDate fechaSalida,
                                 Short numeroPersonas,
                                 Short capacidadPersonasHabitacion,
-                                Double precioNoche){
-        //solo para pruebas
-        precioNoche=10.0;
-        capacidadPersonasHabitacion = 4;
-        numeroPersonas = 4;
+                                BigDecimal precioNoche){
 
         validarDatos(idHuesped,idHabitacion,fechaEntrada,fechaSalida,numeroPersonas,capacidadPersonasHabitacion);
 
@@ -160,6 +161,10 @@ public class Reserva {
     public void actualizar(LocalDate fechaEntrada, LocalDate fechaSalida){
 
         validarFechas(fechaEntrada,fechaSalida);
+
+        if(this.getEstadoReserva().equals(EstadoReserva.EN_CURSO)&& !fechaEntrada.equals(this.fechaEntrada))
+            throw new ConflictoException("No se puede actualizar la fecha de entrada debido a que el huesped ya esta en la habitación");
+
 
         this.fechaSalida=fechaSalida;
         this.fechaEntrada=fechaEntrada;

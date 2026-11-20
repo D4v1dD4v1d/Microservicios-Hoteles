@@ -4,6 +4,8 @@ import com.david.commons.dto.habitaciones.DatosHabitacion;
 import com.david.commons.dto.huespedes.DatosHuesped;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.math.BigDecimal;
+
 
 @Schema(description = "Datos de una reserva")
 public record ReservaResponse(
@@ -15,10 +17,12 @@ public record ReservaResponse(
         String FechaSalida,
         @Schema(description = "Número de personas que ingresarán al hotel")
         Short numeroPesronas,
+        @Schema(description = "Estado en el que se encuentra la reserva")
+        String estadoReserva,
         @Schema(description = "Dato del huéspede")
         DatosHuesped datosHuesped,
         @Schema(description = "Datos de la habitación")
         DatosHabitacion datosHabitacion,
         @Schema(description = "Monto total de la reserva")
-        Double precioTotal
+        BigDecimal precioTotal
 ) {}

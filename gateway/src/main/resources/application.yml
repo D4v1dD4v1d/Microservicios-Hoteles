@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9000/oauth2/jwks
+
   cloud:
     gateway:
       server:
@@ -11,10 +17,10 @@ spring:
           x-forwarded:
             prefix-enabeled: true
           routes:
-            - id: ruta-reserva
-              uri: lb://reserva
+            - id: ruta-reservas
+              uri: lb://reservas
               predicates:
-                - Path=/api/reserva/**
+                - Path=/api/reservas/**
               filters:
                 - StripPrefix=2
 
