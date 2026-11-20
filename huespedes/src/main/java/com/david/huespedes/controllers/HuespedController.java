@@ -26,7 +26,6 @@ public class HuespedController extends CrudController<HuespedRequest, HuespedRes
         super(service);
     }
 
-
     @GetMapping("/id-huesped/{id}")
     @Operation(summary = "Obtener huesped por id sin importar el estado del registro")
     @ApiResponse(responseCode = "200", description = "Huesped sin estado encontrado")
@@ -54,8 +53,5 @@ public class HuespedController extends CrudController<HuespedRequest, HuespedRes
         service.actualizarTipoDocumento(id, idTipoDocumento);
         return ResponseEntity.noContent().build();
     }
-
-
-
 
 }
