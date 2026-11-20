@@ -15,7 +15,7 @@ public class OpenApiConfig {
 
         @Bean
         public OpenAPI openAPI(){
-            //final String schemaName = "bearerAuth";
+            final String schemaName = "bearerAuth";
 
             return new OpenAPI()
                     .info( new Info()
@@ -29,15 +29,15 @@ public class OpenApiConfig {
                             new Server()
                                     .url("http://localhost:8083")
                                     .description("Servidor de localhost")
-                    ));
-                    /*.components(new Components().addSecuritySchemes(schemaName,
+                    ))
+                    .components(new Components().addSecuritySchemes(schemaName,
                             new SecurityScheme()
                                     .name(schemaName)
                                     .type(SecurityScheme.Type.HTTP)
                                     .scheme("bearer")
                                     .bearerFormat("JWT")
 
-                    )).addSecurityItem(new SecurityRequirement().addList(schemaName));*/
+                    )).addSecurityItem(new SecurityRequirement().addList(schemaName));
         }
     }
 
