@@ -5,6 +5,8 @@ import com.david.commons.enums.EstadoHabitacion;
 import com.david.commons.enums.EstadoRegistro;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.math.BigDecimal;
+
 @Schema(description = "Información de una habitación registrada")
 public record HabitacionResponse(
 
@@ -12,13 +14,13 @@ public record HabitacionResponse(
         Long idHabitacion,
 
         @Schema(description = "Número de la habitación", example = "101")
-        Integer numero,
+        Long numero,
 
         @Schema(description = "Tipo de habitación", example = "DOBLE")
         String tipo,
 
         @Schema(description = "Precio por noche", example = "1250.50")
-        Double precio,
+        BigDecimal precio,
 
         @Schema(description = "Capacidad máxima de personas", example = "2")
         Short capacidad,

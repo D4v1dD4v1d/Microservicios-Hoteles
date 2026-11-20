@@ -1,78 +1,55 @@
 package com.leonardo.habitacion.controller;
 
-import com.david.commons.dto.habitaciones.*;
-import com.david.commons.enums.EstadoHabitacion;
 import com.leonardo.habitacion.service.HabitacionService;
+import com.david.commons.controller.CrudController;
+import com.david.commons.docs.ProblemaDoc;
+import com.david.commons.dto.habitaciones.HabitacionRequest;
+import com.david.commons.dto.habitaciones.HabitacionResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
-@Validated
-@Tag(name = "Habitaciones", description = "Gestión de habitaciones del hotel")
-public class HabitacionController {
-    private final HabitacionService service;
+@RequestMapping("/api/habitacion")
+@Tag(name = "API Habitaciones", description = "Métodos para la gestión de habitaciones")
+public class HabitacionController extends CrudController<HabitacionRequest, HabitacionResponse, HabitacionService> {
 
-    @PostMapping
-    @Operation(summary = "Registrar habitación (ADMIN)")
-    public ResponseEntity<HabitacionResponse> registrar(@Valid @RequestBody HabitacionRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.registrar(request));
+    public HabitacionController(HabitacionService service) {
+        super(service);
     }
 
-    @GetMapping
-    @Operation(summary = "Listar habitaciones activas (USER/ADMIN)")
-    public ResponseEntity<List<HabitacionResponse>> listar() {
-        return ResponseEntity.ok(service.listar());
+    @GetMapping("/id-habitacion/{id}")
+    @Operation(summary = "Obtener habitación por ID sin importar el estado del registro")
+    @ApiResponse(responseCode = "200", description = "Habitación encontrada exitosamente")
+    @ApiResponse(responseCode = "404", description = "La habitación no existe",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemaDoc.class)))
+    public ResponseEntity<HabitacionResponse> obtenerHabitacionSinValidarEstado(
+            @PathVariable @Positive(message = "El ID debe ser positivo") Long id
+    ) {
+        return ResponseEntity.ok(service.obtenerHabitacionSinValidarEstado(id));
     }
 
-    @GetMapping("/{idHabitacion}")
-    @Operation(summary = "Consultar habitación activa (USER/ADMIN)")
-    public ResponseEntity<HabitacionResponse> buscar(@PathVariable @Positive Long idHabitacion) {
-        return ResponseEntity.ok(service.buscarPorId(idHabitacion));
+    @PatchMapping("/{id}/estado/{idEstado}")
+    @Operation(summary = "Cambiar el estado de una habitación (solo ADMIN)")
+    public ResponseEntity<HabitacionResponse> cambiarEstado(
+            @PathVariable @Positive(message = "El ID debe ser positivo") Long id,
+            @PathVariable Long idEstado
+    ) {
+        return ResponseEntity.ok(service.cambiarEstado(id, idEstado));
     }
 
-    @GetMapping("/id-habitacion/{idHabitacion}")
-    @Operation(summary = "Consulta interna para Feign (sin estadoRegistro)")
-    public ResponseEntity<DatosHabitacion> consultaInterna(@PathVariable @Positive Long idHabitacion) {
-        return ResponseEntity.ok(service.consultarInterno(idHabitacion));
-    }
-
-    @PutMapping("/{idHabitacion}")
-    @Operation(summary = "Actualizar datos de habitación, sin modificar su estado (ADMIN)")
-    public ResponseEntity<HabitacionResponse> actualizar(
-            @PathVariable @Positive Long idHabitacion, @Valid @RequestBody HabitacionRequest request) {
-        return ResponseEntity.ok(service.actualizar(idHabitacion, request));
-    }
-
-    @PatchMapping("/{idHabitacion}/estado/{idEstado}")
-    @Operation(summary = "Cambio manual de estado (ADMIN)")
-    public ResponseEntity<Void> cambiarEstado(@PathVariable @Positive Long idHabitacion,
-                                               @PathVariable @Positive Long idEstado) {
-        service.cambiarEstadoManual(idHabitacion, idEstado);
-        return ResponseEntity.noContent().build();
-    }
-
-    // Necesita autorización de servicio a servicio: NO exponer esta ruta a usuarios finales.
-    @PatchMapping("/interno/{idHabitacion}/estado/{estado}")
-    @Operation(summary = "Cambio automático exclusivo de Reservas")
-    public ResponseEntity<Void> cambioAutomatico(@PathVariable @Positive Long idHabitacion,
-                                                  @PathVariable EstadoHabitacion estado) {
-        service.cambiarEstadoAutomatico(idHabitacion, estado);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{idHabitacion}")
-    @Operation(summary = "Eliminar lógicamente una habitación (ADMIN)")
-    public ResponseEntity<Void> eliminar(@PathVariable @Positive Long idHabitacion) {
-        service.eliminar(idHabitacion);
-        return ResponseEntity.noContent().build();
+    @PutMapping("/id-habitacion/{id}/estado/{idEstado}")
+    @Operation(summary = "Cambiar estado de la habitación (uso interno de Reservas)")
+    public ResponseEntity<HabitacionResponse> cambiarEstadoInterno(
+            @PathVariable @Positive(message = "El ID debe ser positivo") Long id,
+            @PathVariable Long idEstado
+    ) {
+        return ResponseEntity.ok(service.cambiarEstadoInterno(id, idEstado));
     }
 }

@@ -9,4 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface ReservaClient {
     @GetMapping("/interno/habitaciones/{idHabitacion}/restricciones")
     RestriccionesReservaHabitacion obtenerRestricciones(@PathVariable("idHabitacion") Long idHabitacion);
+
+    @GetMapping("/id-habitacion/{idHabitacion}/personas-vigente")
+    Integer personasReservaVigente(@PathVariable("idHabitacion") Long idHabitacion);
 }

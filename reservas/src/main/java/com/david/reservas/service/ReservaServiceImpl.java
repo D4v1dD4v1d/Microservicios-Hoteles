@@ -1,7 +1,10 @@
 package com.david.reservas.service;
 
+import com.david.commons.clients.HabitacionClient;
 import com.david.commons.clients.HuespedClient;
+import com.david.commons.dto.habitaciones.HabitacionResponse;
 import com.david.commons.dto.huespedes.HuespedResponse;
+import com.david.commons.enums.EstadoHabitacion;
 import com.david.commons.enums.EstadoRegistro;
 import com.david.commons.exceptions.ConflictoException;
 import com.david.commons.exceptions.RecursoNoEncontradoException;
@@ -18,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 import static com.david.reservas.enums.EstadoReserva.*;
 
@@ -27,7 +29,6 @@ import static com.david.reservas.enums.EstadoReserva.*;
 @Transactional
 @RequiredArgsConstructor
 
-//todo validar habitación obtener datos y cambiar estado
 public class ReservaServiceImpl implements ReservaService{
     private final ReservaMapper reservaMapper;
     private final ReservaRepository reservaRepository;
@@ -36,7 +37,7 @@ public class ReservaServiceImpl implements ReservaService{
 
 
     private final HuespedClient huespedClient;
-
+    private final HabitacionClient habitacionClient;
     @Override
     public ReservaResponse actualizar(ReservaRequest request, Long id) {
         return null;
@@ -45,6 +46,10 @@ public class ReservaServiceImpl implements ReservaService{
     @Override
     public ReservaResponse actualizarReserva(ActualizarReservaRequest request, Long id) {
         Reserva reserva = obtenerReserva(id);
+
+        HabitacionResponse habitacion = obtenerHabitacionResponse(reserva.getIdHabitacion());
+
+        HuespedResponse huesped =  obtenerHuespedResponse(reserva.getIdHuesped());
 
         log.info("Actualizando reserva con id: {}...", id);
 
@@ -56,7 +61,7 @@ public class ReservaServiceImpl implements ReservaService{
         reservaRepository.saveAndFlush(reserva);
 
         log.info("Reserva actualizada exitosamente");
-        return reservaMapper.entidadAResponse(reserva);
+        return reservaMapper.entidadAResponse(reserva,huesped,habitacion);
     }
 
     @Override
@@ -70,16 +75,18 @@ public class ReservaServiceImpl implements ReservaService{
         reservaRepository.saveAndFlush(reserva);
 
         log.info("Reserva eliminada.");
-
-        //si la reserva estaba en pendiente liberar la habitación
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ReservaResponse> lista() {
         log.info("Listando las reservas...");
+
         return reservaRepository.findByEstadoRegistro(EstadoRegistro.ACTIVO).stream()
-                .map(reservaMapper::entidadAResponse)
+                .map((reserva)->reservaMapper.entidadAResponse(
+                        reserva,
+                        obtenerHuespedResponse(reserva.getIdHuesped()),
+                        obtenerHabitacionResponse(reserva.getIdHabitacion())))
                 .toList();
     }
 
@@ -87,28 +94,35 @@ public class ReservaServiceImpl implements ReservaService{
     @Transactional(readOnly = true)
     public ReservaResponse obtenerPorId(Long id) {
         Reserva reserva = obtenerReserva(id);
-        return reservaMapper.entidadAResponse(reserva);
+
+        HabitacionResponse habitacion = obtenerHabitacionResponse(reserva.getIdHabitacion());
+
+        HuespedResponse huesped =  obtenerHuespedResponse(reserva.getIdHuesped());
+
+        return reservaMapper.entidadAResponse(reserva,huesped,habitacion);
     }
 
     @Override
     public ReservaResponse registrar(ReservaRequest request) {
         log.info("Registrando la reserva...");
-        //traer la habitacion
-        //Validar habitacion disponible
+
+        HabitacionResponse habitacion = obtenerHabitacionResponse(request.idHabitacion());
+
+        habitacionDisponible(habitacion);
 
         validarHuespedNoTieneReservas(request.idHuesped());
 
         HuespedResponse huesped =  obtenerHuespedResponse(request.idHuesped());
 
-        Reserva reserva = reservaMapper.requestAEntidad(request, huesped);
+        Reserva reserva = reservaMapper.requestAEntidad(request, habitacion);
 
         reservaRepository.saveAndFlush(reserva);
 
-        //cambiar habitacion a no disponible
+        cambiarEstadoHabitacion(habitacion.idHabitacion(),EstadoHabitacion.OCUPADA);
 
         log.info("Reserva registrada");
 
-        return reservaMapper.entidadAResponse(reserva);
+        return reservaMapper.entidadAResponse(reserva,huesped,habitacion);
     }
 
     @Override
@@ -120,6 +134,13 @@ public class ReservaServiceImpl implements ReservaService{
 
         reserva.actualizarEstadoReserva(
                 EstadoReserva.obtenerEstadoCitaPorCodigo(idEstado));
+
+        if(reserva.getEstadoReserva().equals(CANCELADA)
+           || reserva.getEstadoReserva().equals(FINALIZADA)){
+                cambiarEstadoHabitacion(reserva.getIdHabitacion(),EstadoHabitacion.DISPONIBLE);
+        } else {
+            cambiarEstadoHabitacion(reserva.getIdHabitacion(),EstadoHabitacion.OCUPADA);
+        }
 
         reservaRepository.saveAndFlush(reserva);
 
@@ -160,6 +181,11 @@ public class ReservaServiceImpl implements ReservaService{
         return huespedClient.obtenerPorId(id);
     }
 
+    private HabitacionResponse obtenerHabitacionResponse(Long id){
+        log.info("Obteniendo la habitación response...");
+        return habitacionClient.obtenerPorId(id);
+    }
+
     private void validarHuespedNoTieneReservas(Long idHuesped){
         log.info("Validando que el huesped no tenga reservas en estado {}",estadosNoValidos);
 
@@ -167,6 +193,17 @@ public class ReservaServiceImpl implements ReservaService{
             throw new ConflictoException("El húesped ya tiene una reservación confirmada o en curso.");
     }
 
+    private void habitacionDisponible(HabitacionResponse habitacion){
+
+        if(!habitacion.estado().equals(EstadoHabitacion.DISPONIBLE))
+            throw new ConflictoException("La habitación no esta disponible por el momento.");
+    }
+
+    private void cambiarEstadoHabitacion(Long id, EstadoHabitacion estado){
+        log.info("Cambiando estado de la habitación");
+
+        habitacionClient.cambiarEstado(id,estado.getId());
+    }
 
 
 }

@@ -1,24 +1,27 @@
 package com.david.commons.dto.habitaciones;
 
+import com.david.commons.enums.TipoHabitacion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+
+import java.math.BigDecimal;
 
 @Schema(description = "Datos para registrar o actualizar una habitación")
 public record HabitacionRequest(
         @Schema(example = "101")
         @NotNull(message = "El número es requerido")
         @Positive(message = "El número debe ser mayor que cero")
-        Integer numero,
+        Long numero,
 
-        @Schema(example = "DOBLE", allowableValues = {"SENCILLA", "DOBLE", "SUITE"})
+        @Schema(example = "DOBLE", allowableValues = {"Sencilla", "Doble", "Suite"})
         @NotBlank(message = "El tipo es requerido")
-        @Pattern(regexp = "SENCILLA|DOBLE|SUITE", message = "El tipo debe ser SENCILLA, DOBLE o SUITE")
+        @Pattern(regexp = "Sencilla|Doble|Suite", message = "El tipo debe ser Sencilla, Doble o Suite")
         String tipo,
 
         @Schema(example = "1250.50")
         @NotNull(message = "El precio es requerido")
         @Positive(message = "El precio debe ser mayor que cero")
-        Double precio,
+        BigDecimal precio,
 
         @Schema(example = "2")
         @NotNull(message = "La capacidad es requerida")

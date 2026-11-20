@@ -1,49 +1,102 @@
-
 package com.leonardo.habitacion.entity;
 
 import com.david.commons.enums.EstadoHabitacion;
 import com.david.commons.enums.EstadoRegistro;
+import com.david.commons.enums.TipoHabitacion;
+import com.david.commons.exceptions.ConflictoException;
+import com.david.commons.exceptions.DatoInvalidoException;
+import com.david.commons.utils.ValoresNumericosUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+
+import java.math.BigDecimal;
 
 @Entity
-@Table(name = "HABITACION", schema = "HOTELES")
+@Table(name = "HABITACION")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
-@Setter
 public class Habitacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_HABITACION")
-    private Long idHabitacion;
+    private Long id;
 
-    @Column(name = "NUMERO", nullable = false)
-    private Integer numero;
+    @Column(name = "NUMERO", nullable = false)          // sin unique (Notion 5.2)
+    private Long numero;
 
-    @Column(name = "TIPO", length = 50, nullable = false)
-    private String tipo;
-
-    @JdbcTypeCode(SqlTypes.NUMERIC)
-    @Column(name = "PRECIO", precision = 10, scale = 2, nullable = false)
-    private Double precio;
+    @Column(name = "PRECIO",columnDefinition = "NUMBER(10,2)", nullable = false)
+    private BigDecimal precio;
 
     @Column(name = "CAPACIDAD", nullable = false)
     private Short capacidad;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "ESTADO", length = 30, nullable = false)
-    private EstadoHabitacion estado;
+    @Column(name = "ESTADO", nullable = false)          // antes ESTADO_HABITACION
+    private EstadoHabitacion estadoHabitacion;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "ESTADO_REGISTRO", length = 30, nullable = false)
+    @Column(name = "ESTADO_REGISTRO", nullable = false)
     private EstadoRegistro estadoRegistro;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TIPO", nullable = false)            // antes TIPO_HABITACION
+    private TipoHabitacion tipoHabitacion;
+
+    private void validarNoEliminado() {
+        if (this.estadoRegistro == EstadoRegistro.ELIMINADO) {
+            throw new ConflictoException("La habitación ya se encuentra eliminada.");
+        }
+    }
+
+    public static void validarDatos(Long numero, BigDecimal precio, Short capacidad, TipoHabitacion tipoHabitacion) {
+        ValoresNumericosUtils.validadLongPositivo(numero, "El número de habitación debe ser un número entero y mayor que 0.");
+        ValoresNumericosUtils.validarBigDecimalPositivo(precio, "El precio de la habitación debe ser mayor a 0.");
+        ValoresNumericosUtils.validadShortPositivo(capacidad, "La capacidad de la habitación debe ser al menos 1.");
+
+        if (tipoHabitacion == null) {
+            throw new DatoInvalidoException("El tipo de habitación es obligatorio."); // 400, antes daba 500
+        }
+    }
+
+    public void actualizar(Long numero, BigDecimal precio, Short capacidad, TipoHabitacion tipoHabitacion) {
+        validarNoEliminado();
+        validarDatos(numero, precio, capacidad, tipoHabitacion);
+
+        this.numero = numero;
+        this.precio = precio;
+        this.capacidad = capacidad;
+        this.tipoHabitacion = tipoHabitacion;
+    }
+
+    public void eliminar() {
+        validarNoEliminado();
+        if (this.estadoHabitacion == EstadoHabitacion.OCUPADA) {
+            throw new ConflictoException("No se puede eliminar una habitación OCUPADA."); // Notion 6.3
+        }
+        this.estadoRegistro = EstadoRegistro.ELIMINADO;
+    }
+
+    // NUEVO: el service decide si la transición es válida
+    public void cambiarEstado(EstadoHabitacion nuevoEstado) {
+        this.estadoHabitacion = nuevoEstado;
+    }
+
+    public static Habitacion crear(Long numero, BigDecimal precio, Short capacidad, TipoHabitacion tipoHabitacion) {
+        validarDatos(numero, precio, capacidad, tipoHabitacion);
+
+        return Habitacion.builder()
+                .numero(numero)
+                .precio(precio)
+                .capacidad(capacidad)
+                .tipoHabitacion(tipoHabitacion)
+                .estadoHabitacion(EstadoHabitacion.DISPONIBLE)
+                .estadoRegistro(EstadoRegistro.ACTIVO)
+                .build();
+    }
 }
