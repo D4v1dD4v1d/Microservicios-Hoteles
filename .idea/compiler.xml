@@ -21,15 +21,15 @@
         </processorPath>
         <module name="commons" />
       </profile>
-      <profile name="Annotation profile for auth" enabled="true">
+      <profile name="Annotation profile for habitacion" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.48/lombok-1.18.48.jar" />
         </processorPath>
-        <module name="auth" />
         <module name="huespedes" />
+        <module name="auth" />
         <module name="habitacion" />
       </profile>
     </annotationProcessing>
