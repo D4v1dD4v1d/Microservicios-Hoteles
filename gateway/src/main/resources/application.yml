@@ -1,0 +1,67 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
+          jwk-set-uri: http://localhost:9000/oauth2/jwks
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+          x-forwarded:
+            prefix-enabled: true
+          routes:
+            - id: ruta-login
+              uri: http://localhost:9000
+              predicates:
+                - Path=/api/login
+
+            - id: ruta-usuarios
+              uri: http://localhost:9000
+              predicates:
+                - Path=/api/usuarios/**
+              filters:
+                - RewritePath=/api/usuarios(?<segment>/?.*), /admin/usuarios$\{segment}
+
+            - id: ruta-reservas
+              uri: lb://reservas
+              predicates:
+                - Path=/api/reservas/**
+              filters:
+                - StripPrefix=2
+
+            - id: ruta-habitacion
+              uri: lb://habitacion
+              predicates:
+                - Path=/api/habitacion/**
+
+            - id: ruta-habitaciones
+              uri: lb://habitacion
+              predicates:
+                - Path=/api/habitaciones/**
+              filters:
+                - RewritePath=/api/habitaciones(?<segment>/?.*), /api/habitacion$\{segment}
+
+            - id: ruta-huesped
+              uri: lb://huespedes
+              predicates:
+                - Path=/api/huesped/**,/api/huespedes/**
+              filters:
+                - StripPrefix=2
+    loadbalancer:
+      enabled: true
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true   # Registrarse con la IP y no con el nombre de host
