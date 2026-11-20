@@ -138,6 +138,16 @@ public class ReservaServiceImpl implements ReservaService{
     }
 
     @Override
+    @Transactional
+    public void validarEliminacionHuesped(Long idHuesped) {
+        if (reservaRepository.existsByIdHuespedAndEstadoRegistroAndEstadoReservaIn(
+                idHuesped, EstadoRegistro.ACTIVO, estadosNoValidos)) {
+            throw new ConflictoException(
+                    "No se puede eliminar el huesped: tiene reservas CONFIRMADAS o EN_CURSO");
+        }
+    }
+
+    @Override
     public void habitacionTieneReservasAsignadas(Long idHabitacion) {
         if (reservaRepository.existsByIdHabitacionAndEstadoRegistroAndEstadoReservaIn(
                 idHabitacion,

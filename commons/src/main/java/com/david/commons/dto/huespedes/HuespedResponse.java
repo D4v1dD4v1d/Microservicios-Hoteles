@@ -17,7 +17,7 @@ public record HuespedResponse(
         @Schema(description = "Telefono del huesped", example = "1234567890")
         String telefono,
 
-        @Schema(description = "Tipo del documento dejado por el huesped", example = "INE")
+        @Schema(description = "Tipo del documento dejado por el huesped", example = "3")
         String tipoDocumento,
 
         @Schema(description = "Numero de indentifiacion del documento", example = "222229777")

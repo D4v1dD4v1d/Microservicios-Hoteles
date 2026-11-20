@@ -30,5 +30,7 @@ public interface ReservaService extends CrudService<ReservaRequest, ReservaRespo
 
     void huespedTieneReservasAsignadas(@Positive(message = "El idHuesped debe ser positivo") Long idHuesped);
 
+    void validarEliminacionHuesped(@Positive (message = "El idHuesped debe ser positivo") Long idHuesped);
+
     void habitacionTieneReservasAsignadas(@Positive(message = "El idHabitacion debe ser positivo") Long idHabitacion);
 }

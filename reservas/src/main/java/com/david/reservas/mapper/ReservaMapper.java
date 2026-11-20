@@ -61,7 +61,7 @@ public class ReservaMapper implements CommonMapper<ReservaRequest,Reserva,Reserv
     public ReservaResponse entidadAResponse(Reserva entidad, HuespedResponse huesped, HabitacionResponse habitacion) {
         ReservaResponse reservaResponse = entidadAResponse(entidad);
 
-        reservaResponse.datosHabitacion().equals(responseADatosHabitacion(habitacion));
+       //reservaResponse.datosHabitacion().equals(responseADatosHabitacion(habitacion));
 
         reservaResponse.datosHuesped().equals(responseADatosHuesped(huesped));
 
@@ -80,12 +80,19 @@ public class ReservaMapper implements CommonMapper<ReservaRequest,Reserva,Reserv
                 huesped.nacionalidad(),
                 huesped.estadoRegistro());
     }
-
+/*
     private DatosHabitacion responseADatosHabitacion(HabitacionResponse habitacion){
         return habitacion == null
                 ? null
                 : new DatosHabitacion(
-
+                habitacion.numero(),
+                habitacion.tipo(),
+                habitacion.precio(),
+                habitacion.precio(),
+                habitacion.capacidad(),
+                habitacion.estado()
                 );
     }
+    */
+
 }

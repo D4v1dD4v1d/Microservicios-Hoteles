@@ -73,6 +73,19 @@ public class ReservaController extends CrudController<ReservaRequest, ReservaRes
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/id-huesped/{idHuesped}/validar-eliminacion")
+    @Operation(summary = "Validar si un huésped puede ser eliminado (no debe tener reservas activas)")
+    @ApiResponse(responseCode = "204", description = "El huésped no tiene reservas que impidan su eliminación")
+    @ApiResponse(responseCode = "409", description = "El huésped tiene reservas activas o en curso y no puede eliminarse",
+            content = @Content(mediaType = "application/problem+json",
+                    schema = @Schema(implementation = ProblemaDoc.class)))
+    public ResponseEntity<Void> validarEliminacionHuesped(
+            @PathVariable @Positive(message = "El ID del huésped debe ser positivo") Long idHuesped
+    ) {
+        service.validarEliminacionHuesped(idHuesped);
+        return ResponseEntity.noContent().build();
+    }
+
     @ApiResponse(responseCode = "204", description = "La habitación no tiene reservas asignadas")
     @ApiResponse(responseCode = "409", description = "La habitación tiene reservas asignadas y no se puede modificar ni eliminar",
             content = @Content(mediaType = "application/problem+json",

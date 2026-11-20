@@ -7,6 +7,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "reservas")
 public interface ReservaClient {
+
     @GetMapping("/interno/habitaciones/{idHabitacion}/restricciones")
     RestriccionesReservaHabitacion obtenerRestricciones(@PathVariable("idHabitacion") Long idHabitacion);
+
+    @GetMapping("/id-huesped/{idHuesped}/validar-eliminacion")
+    void validarEliminacionHuespedConReserva(@PathVariable("idHuesped") Long idHuesped);
+
+    @GetMapping("/id-huesped/{idHuesped}/reservas-asignadas")
+    void huespedTieneReservasAsignadas(@PathVariable Long idHuesped);
+
+
+
 }
