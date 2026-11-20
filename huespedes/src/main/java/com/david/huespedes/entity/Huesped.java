@@ -1,6 +1,7 @@
 package com.david.huespedes.entity;
 
 import com.david.commons.exceptions.ConflictoException;
+import com.david.commons.exceptions.DatoInvalidoException;
 import com.david.commons.utils.StringCustomUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -60,27 +61,37 @@ public class Huesped {
                                     String numeroDocumento) {
 
         StringCustomUtils.validarTamanio(nombre, 2, 50,
-                "El nombre es requerido y debe tener entre 2 y 50 caracteres");
+                "El nombre es requerido, debe tener entre 2 y 50 caracteres");
 
         StringCustomUtils.validarTamanio(apellidos, 2, 50,
-                "Los apellidos son requeridos y deben tener entre 2 y 50 caracteres");
+                "Los apellidos son requeridos, deben tener entre 2 y 50 caracteres");
 
         StringCustomUtils.validarTamanio(email, 1, 50,
-                "El email es requerido y debe tener entre 1 y 50 caracteres");
+                "El email es requerido,  debe tener entre 1 y 50 caracteres");
 
         StringCustomUtils.validarTamanio(nacionalidad, 2, 50,
-                "La nacionalidad es obligatoria y debe contener entre 2 y 50 caracteres");
+                "La nacionalidad es obligatoria, debe contener entre 2 y 50 caracteres");
 
         StringCustomUtils.validarTamanio(telefono, 10, 10,
-                "El telefono es requerido y debe tener 10 caracteres");
+                "El telefono es requerido, debe tener 10 caracteres");
 
         StringCustomUtils.validarTamanio(numeroDocumento, 8, 20,
-                "El número de documento es obligatorio y debe contener entre 8 y 20 caracteres");
+                "El número de documento es obligatorio, debe contener entre 8 y 20 caracteres");
     }
-    /*public void validarNoEliminado(){
+
+    public void validarNoEliminado(){
         if (this.estadoRegistro == EstadoRegistro.ELIMINADO)
-            throw new ConflictoException("El paciente ya esta eliminado");
-    }*/
+            throw new ConflictoException("El huesped ya esta eliminado");
+    }
+
+    public void actualizarTipoDocumento(TipoDocumento tipoDocumento){
+        validarNoEliminado();
+
+        if(tipoDocumento == null)
+            throw new DatoInvalidoException("El estado de registro es requerida");
+
+        this.tipoDocumento = tipoDocumento;
+    }
 
     public void actualizar(String nombre,String apellidos, String email,String telefono,
                            String nacionalidad, TipoDocumento tipoDocumento, String numeroDocumento){
@@ -99,7 +110,7 @@ public class Huesped {
     }
 
     public static Huesped crear(String nombre,String apellidos, String email,String telefono,
-                           TipoDocumento tipoDocumento, String nacionalidad, String numeroDocumento) {
+                                String nacionalidad, String numeroDocumento) {
 
 
         validarDatos(nombre, apellidos, email, telefono,
@@ -110,8 +121,8 @@ public class Huesped {
                 .apellidos(apellidos.trim())
                 .email(email.trim().toLowerCase())
                 .nacionalidad(nacionalidad.trim())
-                .tipoDocumento(tipoDocumento)
                 .telefono(telefono.trim())
+                .tipoDocumento(TipoDocumento.INE)
                 .estadoRegistro(EstadoRegistro.ACTIVO)
                 .numeroDocumento(numeroDocumento.trim())
                 .build();
